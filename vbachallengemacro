@@ -1,0 +1,50 @@
+Sub stonks()
+
+Dim tick As String
+Dim thistick As Integer
+Dim tickopen As Double
+Dim tickclose As Double
+Dim tickvol As LongLong
+Dim lastrow As Long
+
+tick = "definatelynotthis"
+
+For Each ws In Worksheets
+
+    thistick = 2
+    lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+    
+    For i = 2 To lastrow
+        If i = 2 Then
+            tick = ws.Cells(i, 1).Value
+            ws.Cells(thistick, 9).Value = tick
+            tickvol = ws.Cells(i, 7).Value
+            tickopen = ws.Cells(i, 3).Value
+            thistick = thistick + 1
+        ElseIf ws.Cells(i, 1).Value <> tick Then
+            tickvol = ws.Cells(i, 7).Value
+            tick = ws.Cells(i, 1).Value
+            ws.Cells(thistick, 9).Value = tick
+            tickopen = ws.Cells(i, 3)
+            thistick = thistick + 1
+         Else
+            tickvol = tickvol + ws.Cells(i, 7).Value
+            tickclose = ws.Cells(i, 6).Value
+            ws.Cells(thistick - 1, 12) = tickvol
+            ws.Cells(thistick - 1, 10).Value = tickclose - tickopen
+            If tickopen = 0 Then
+                ws.Cells(thistick - 1, 11).Value = "Undefined"
+            Else
+                ws.Cells(thistick - 1, 11).Value = FormatPercent(ws.Cells(thistick - 1, 10).Value / tickopen)
+            End If
+        End If
+        If ws.Cells(thistick - 1, 10).Value < 0 Then
+                ws.Cells(thistick - 1, 10).Interior.ColorIndex = 3
+        Else
+                ws.Cells(thistick - 1, 10).Interior.ColorIndex = 4
+        End If
+    Next i
+    
+Next ws
+
+End Sub
